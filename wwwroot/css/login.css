@@ -1,0 +1,167 @@
+﻿/* Genel ayarlar */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #008891, #005a87);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #333;
+}
+
+/* Sayfa kutusu */
+.login-wrapper {
+    padding: 20px;
+    width: 100%;
+    max-width: 420px;
+}
+
+/* Kart görünümü */
+.login-card {
+    background-color: #ffffff;
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    padding: 40px 30px;
+    text-align: center;
+    animation: slideIn 0.5s ease;
+}
+
+/* Giriş animasyonu */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Logo alanı */
+.logo {
+    font-size: 48px;
+    margin-bottom: 15px;
+}
+
+/* Başlık ve alt başlık */
+.title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #005a87;
+    margin-bottom: 5px;
+}
+
+.subtitle {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 25px;
+}
+
+/* Form ve grup alanları */
+.login-form .form-group {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.login-form label {
+    display: block;
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 6px;
+    color: #333;
+}
+
+/* Input alanları + ikon */
+.input-wrapper {
+    position: relative;
+}
+
+    .input-wrapper .icon {
+        position: absolute;
+        top: 50%;
+        left: 14px;
+        transform: translateY(-50%);
+        font-size: 16px;
+        color: #aaa;
+        pointer-events: none;
+    }
+
+    .input-wrapper input {
+        width: 100%;
+        padding: 12px 14px 12px 40px;
+        border: 1.5px solid #ccc;
+        border-radius: 10px;
+        font-size: 15px;
+        background-color: #fafafa;
+        transition: border-color 0.3s, background-color 0.3s, box-shadow 0.3s;
+    }
+
+        .input-wrapper input:focus {
+            border-color: #2e8bc0;
+            background-color: #fff;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(46, 139, 192, 0.15);
+        }
+
+/* Giriş butonu */
+.btn-login {
+    background-color: #005a87;
+    color: white;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    padding: 12px;
+    width: 100%;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s, transform 0.1s;
+}
+
+    .btn-login:hover {
+        background-color: #007ca8;
+    }
+
+    .btn-login:active {
+        transform: scale(0.98);
+    }
+
+/* Kayıt bağlantısı */
+.register-link {
+    font-size: 14px;
+    margin-top: 16px;
+    color: #444;
+}
+
+    .register-link a {
+        color: #005a87;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+
+/* Mobil uyumluluk */
+@media (max-width: 480px) {
+    .login-card {
+        padding: 30px 20px;
+    }
+
+    .title {
+        font-size: 22px;
+    }
+
+    .subtitle {
+        font-size: 13px;
+    }
+}

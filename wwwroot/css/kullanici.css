@@ -1,0 +1,211 @@
+﻿/* Genel Ayarlar */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    background-color: #f4f6f9;
+    color: #333;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 230px;
+    min-height: 100vh;
+    background-color: #005a87;
+    color: white;
+    padding: 30px 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+    .sidebar h2 {
+        font-size: 20px;
+        margin-bottom: 40px;
+        font-weight: 600;
+    }
+
+.nav-link {
+    display: block;
+    margin-bottom: 14px;
+    padding: 10px 14px;
+    text-decoration: none;
+    color: #dceef4;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+    font-size: 15px;
+}
+
+    .nav-link:hover,
+    .nav-link.active {
+        background-color: #007ca8;
+        color: #fff;
+    }
+
+/* Main Content */
+.main {
+    margin-left: 230px;
+    padding: 30px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+section {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+    section.active {
+        display: block;
+    }
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.section-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #005a87;
+    margin-bottom: 20px;
+}
+
+/* Anasayfa */
+.intro {
+    font-size: 16px;
+    max-width: 600px;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+.hero-img {
+    max-width: 100%;
+    height: auto;
+    margin-top: 10px;
+    border-radius: 12px;
+}
+
+/* Filtre Barı */
+.filter-bar, .form-grid, .password-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+    .filter-bar select,
+    .filter-bar button,
+    .form-grid input,
+    .form-grid select,
+    .form-grid textarea,
+    .form-grid button,
+    .password-form input,
+    .password-form button {
+        padding: 10px 14px;
+        font-size: 14px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+    }
+
+    .filter-bar button,
+    .form-grid button,
+    .password-form button {
+        background-color: #005a87;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+        .filter-bar button:hover,
+        .form-grid button:hover,
+        .password-form button:hover {
+            background-color: #007ca8;
+        }
+
+/* Harita Kutusu */
+.map-box {
+    height: 300px;
+    background-color: #e0e0e0;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+/* Kart Listeleri */
+.location-list,
+.record-list,
+.announcement-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.location-card,
+.record-card,
+.announcement-card,
+.profile-card {
+    background-color: white;
+    padding: 16px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+    .location-card h3,
+    .record-card h3,
+    .announcement-card h3 {
+        color: #005a87;
+        margin-bottom: 6px;
+        font-size: 16px;
+    }
+
+    .location-card p,
+    .record-card p,
+    .announcement-card p,
+    .profile-card p {
+        font-size: 14px;
+        margin: 3px 0;
+        color: #444;
+    }
+
+    .announcement-card small {
+        font-size: 12px;
+        color: #888;
+        margin-top: 6px;
+        display: block;
+    }
+
+    .profile-card h4 {
+        margin-top: 15px;
+        font-size: 16px;
+        color: #005a87;
+    }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .sidebar {
+        display: none;
+    }
+
+    .main {
+        margin-left: 0;
+        width: 100%;
+        padding: 20px;
+    }
+}

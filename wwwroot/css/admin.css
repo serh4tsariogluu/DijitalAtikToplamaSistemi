@@ -1,0 +1,376 @@
+﻿/* Genel Ayarlar */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    background-color: #f9fafc;
+    color: #333;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 240px;
+    min-height: 100vh;
+    background-color: #004b6b;
+    color: white;
+    padding: 30px 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+    .sidebar h2 {
+        font-size: 20px;
+        margin-bottom: 40px;
+        font-weight: 600;
+    }
+
+.nav-link {
+    display: block;
+    margin-bottom: 14px;
+    padding: 10px 14px;
+    text-decoration: none;
+    color: #dceef4;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+    font-size: 15px;
+}
+
+    .nav-link:hover,
+    .nav-link.active {
+        background-color: #007ca8;
+        color: #fff;
+    }
+
+/* Ana İçerik */
+.main {
+    margin-left: 240px;
+    padding: 30px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+section {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+    section.active {
+        display: block;
+    }
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.section-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #004b6b;
+    margin-bottom: 20px;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.card {
+    background-color: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+    text-align: center;
+}
+
+.card-icon {
+    font-size: 30px;
+    margin-bottom: 10px;
+}
+
+.card-value {
+    font-size: 22px;
+    font-weight: bold;
+    color: #007ca8;
+}
+
+.card-label {
+    font-size: 14px;
+    color: #555;
+}
+
+/* Tablo */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+    background-color: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+    .data-table th,
+    .data-table td {
+        padding: 12px 16px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+    }
+
+    .data-table th {
+        background-color: #f0f4f8;
+        font-weight: 600;
+        color: #004b6b;
+    }
+
+    .data-table td button {
+        background-color: #005a87;
+        color: white;
+        border: none;
+        padding: 6px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-right: 5px;
+        font-size: 13px;
+    }
+
+        .data-table td button:hover {
+            background-color: #007ca8;
+        }
+
+/* Harita Kutusu */
+.map-box {
+    height: 300px;
+    background-color: #dceef4;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    margin: 20px 0;
+}
+
+/* Teslimat Kayıtları */
+.record-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.record-card {
+    background-color: white;
+    padding: 16px;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+}
+
+    .record-card h3 {
+        margin-bottom: 6px;
+        color: #004b6b;
+        font-size: 16px;
+    }
+
+/* Form Alanları */
+.form-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 500px;
+}
+
+    .form-grid input,
+    .form-grid textarea,
+    .form-grid select,
+    .form-grid button {
+        padding: 10px 14px;
+        font-size: 14px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+    }
+
+    .form-grid button {
+        background-color: #004b6b;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+        .form-grid button:hover {
+            background-color: #007ca8;
+        }
+
+/* Rota Seçim Kutusu */
+.route-section {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+    .route-section select,
+    .route-section button {
+        padding: 10px 14px;
+        font-size: 14px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+    }
+
+    .route-section button {
+        background-color: #005a87;
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+
+        .route-section button:hover {
+            background-color: #007ca8;
+        }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .sidebar {
+        display: none;
+    }
+
+    .main {
+        margin-left: 0;
+        padding: 20px;
+        width: 100%;
+    }
+}
+/* ========================================= */
+/* === YENİ (Mavi-Beyaz) BUTON STİLLERİ v3 === */
+/* ========================================= */
+
+/* Ana Paneldeki "Yeni Ekle" Butonları (Canlı Mavi) */
+.btn-primary {
+    background-color: #0d6efd; /* Canlı Mavi */
+    color: #ffffff; /* Beyaz Yazı */
+    border: none; /* ÇİZGİ YOK */
+    padding: 10px 18px;
+    border-radius: 25px; /* Yuvarlak kenarlar */
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 12px rgba(0, 90, 135, 0.2);
+    transition: all 0.3s ease;
+    text-decoration: none; /* Link olursa altını çizmesin */
+}
+
+    .btn-primary:hover {
+        background-color: #0b5ed7;
+        color: #ffffff;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 90, 135, 0.3);
+    }
+
+/* Formlardaki "Oluştur" / "Kaydet" Butonları (Mavi) */
+.btn-success {
+    background-color: #0d6efd; /* Ana mavi ile aynı */
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0, 90, 135, 0.2);
+    transition: all 0.3s ease;
+}
+
+    .btn-success:hover {
+        background-color: #0b5ed7;
+        transform: translateY(-2px);
+    }
+
+/* "Kapat" / "Geri Dön" Butonları (Açık Mavi/Beyaz) */
+.btn-secondary {
+    background-color: #f8f9fa; /* Beyaz/Gri */
+    color: #0d6efd; /* Mavi Metin */
+    border: 1px solid #dee2e6; /* İnce çizgi */
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+    .btn-secondary:hover {
+        background-color: #e9ecef;
+        transform: translateY(-2px);
+    }
+
+/* --- İSTEĞİN ÜZERİNE DEĞİŞTİ --- */
+/* Tablo içindeki "Düzenle" / "Rol Değiştir" Butonları (MAVİ) */
+.btn-warning,
+.btn-sm.btn-warning,
+.btn-action-sm.btn-warning {
+    background-color: #0d6efd; /* Ana Mavi */
+    color: #ffffff; /* Beyaz Yazı */
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+    .btn-warning:hover,
+    .btn-sm.btn-warning:hover,
+    .btn-action-sm.btn-warning:hover {
+        background-color: #0b5ed7; /* Koyu Mavi */
+        transform: scale(1.05);
+    }
+
+/* "Sil" Butonları (Kırmızı - UYARI) */
+.btn-danger,
+.btn-sm.btn-danger,
+.btn-action-sm.btn-danger {
+    background-color: #dc3545; /* Kırmızı */
+    color: white;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+    .btn-danger:hover,
+    .btn-sm.btn-danger:hover,
+    .btn-action-sm.btn-danger:hover {
+        background-color: #c82333;
+        transform: scale(1.05);
+    }
+
+/* "Haritada Göster" Butonları (İkincil Mavi) */
+.btn-info,
+.btn-sm.btn-info {
+    background-color: #0dcaf0; /* Açık Mavi (Cyan) */
+    color: #ffffff;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+    .btn-info:hover,
+    .btn-sm.btn-info:hover {
+        background-color: #0bacc8;
+        transform: scale(1.05);
+    }
