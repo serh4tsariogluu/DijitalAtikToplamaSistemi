@@ -1,0 +1,49 @@
+﻿@model AtikDonusum.Models.WastePoint
+
+@{
+    ViewData["Title"] = "Silme Onayı";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0"><i class="fa fa-exclamation-triangle"></i> Silme Onayı</h4>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title text-center mb-4">Bu atık noktasını silmek istediğinize emin misiniz?</h5>
+
+                    <dl class="row">
+                        <dt class="col-sm-4">Nokta Adı:</dt>
+                        <dd class="col-sm-8 fw-bold">@Html.DisplayFor(model => model.Ad)</dd>
+
+                        <dt class="col-sm-4">Adres:</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.Adres)</dd>
+
+                        <dt class="col-sm-4">Atık Tipleri:</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.KabulEdilenAtikTipleri)</dd>
+
+                        <dt class="col-sm-4">Durum:</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.AktifMi)
+                            {
+                                <span class="badge bg-success">Aktif</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Pasif</span>
+                            }
+                        </dd>
+                    </dl>
+
+                    <form asp-action="Delete" class="text-center mt-4">
+                        <input type="hidden" asp-for="Id" />
+                        <button type="submit" class="btn btn-danger btn-lg px-5">Evet, Sil</button>
+                        <a asp-action="Index" class="btn btn-secondary btn-lg px-5">İptal</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

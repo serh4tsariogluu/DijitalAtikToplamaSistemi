@@ -1,0 +1,465 @@
+﻿@using AtikDonusum.Models
+@{
+    Layout = null;
+    var currentUser = ViewBag.CurrentUser as ApplicationUser;
+    var announcements = ViewBag.AnnouncementsList as List<Announcement>;
+    var deliveries = ViewBag.UserDeliveries as List<Delivery>;
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Kullanıcı Paneli</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f8f9fc;
+            display: flex;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        /* SIDEBAR TASARIMI */
+        .sidebar {
+            width: 260px;
+            background: #2c3e50;
+            color: white;
+            position: fixed;
+            height: 100vh;
+            padding-top: 25px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: #1abc9c;
+            letter-spacing: 1px;
+        }
+
+        .nav-link {
+            color: rgba(255,255,255,0.7);
+            padding: 16px 30px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: 0.3s;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+            .nav-link i {
+                width: 25px;
+                font-size: 1.1rem;
+            }
+
+            .nav-link:hover, .nav-link.active {
+                background: rgba(255,255,255,0.05);
+                color: #fff;
+                border-right: 4px solid #1abc9c;
+                background: linear-gradient(90deg, rgba(26,188,156,0) 0%, rgba(26,188,156,0.1) 100%);
+            }
+
+        /* MAIN CONTENT */
+        .main {
+            margin-left: 260px;
+            width: calc(100% - 260px);
+            padding: 40px;
+        }
+
+        /* KARTLAR */
+        .custom-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            padding: 30px;
+            border: none;
+            margin-bottom: 25px;
+        }
+
+        .card-title {
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* PROFİL TASARIMI */
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            background: #1abc9c;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin: 0 auto 20px;
+            box-shadow: 0 5px 15px rgba(26,188,156,0.3);
+        }
+
+        .stat-box {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid #edf2f7;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #2c3e50;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        /* DUYURU LİSTESİ */
+        .announcement-list {
+            list-style: none;
+            padding: 0;
+        }
+
+            .announcement-list li {
+                border-bottom: 1px solid #eee;
+                padding: 20px 0;
+            }
+
+                .announcement-list li:last-child {
+                    border-bottom: none;
+                }
+
+        .announcement-date {
+            font-size: 0.75rem;
+            color: #95a5a6;
+            font-weight: 600;
+        }
+
+        .announcement-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #34495e;
+            display: block;
+            margin: 5px 0;
+        }
+
+        /* HARİTA */
+        .pac-container {
+            z-index: 10000 !important;
+        }
+
+        #mapPicker {
+            height: 350px;
+            width: 100%;
+            border-radius: 12px;
+            border: 2px solid #eee;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="sidebar-header"><i class="fas fa-recycle"></i> ATIK SİSTEMİ</div>
+
+        <div class="nav-link active" id="link-profil" onclick="showSection('profil')">
+            <i class="fas fa-user-circle"></i> Profilim
+        </div>
+
+        <div class="nav-link" id="link-teslim" onclick="showSection('teslim')">
+            <i class="fas fa-truck-loading"></i> Atık Teslimi
+        </div>
+
+        <div class="nav-link" id="link-gecmis" onclick="showSection('gecmis')">
+            <i class="fas fa-history"></i> Geçmiş Teslimatlar
+        </div>
+
+        <div class="nav-link" id="link-duyurular" onclick="showSection('duyurular')">
+            <i class="fas fa-bullhorn"></i> Duyurular
+        </div>
+
+        <div style="margin-top: auto; padding: 20px;">
+            <form asp-controller="Auth" asp-action="Logout" method="post">
+                @Html.AntiForgeryToken()
+                <button class="btn btn-danger w-100 py-2 fw-bold" style="border-radius: 10px;"><i class="fas fa-sign-out-alt me-2"></i>Çıkış</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="main">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success border-0 shadow-sm mb-4">@TempData["SuccessMessage"]</div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger border-0 shadow-sm mb-4">@TempData["ErrorMessage"]</div>
+        }
+
+        <section id="profil">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="custom-card text-center pb-5">
+                        <h4 class="card-title justify-content-center mb-5">Kullanıcı Bilgileri</h4>
+
+                        <div class="profile-avatar">
+                            @currentUser?.UserName.Substring(0, 1).ToUpper()
+                        </div>
+                        <h3 class="fw-bold text-dark mb-1">@currentUser?.UserName</h3>
+                        <p class="text-muted mb-4">@currentUser?.Email</p>
+
+                        <button class="btn btn-outline-secondary btn-sm mb-4 rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#passwordModal">
+                            <i class="fas fa-key me-2"></i>Şifre Değiştir
+                        </button>
+
+                        <div class="row g-3 justify-content-center px-4">
+                            <div class="col-md-4">
+                                <div class="stat-box">
+                                    <span class="stat-number text-success">@ViewBag.TotalWaste kg</span>
+                                    <span class="stat-label">Toplam Atık</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stat-box">
+                                    <span class="stat-number text-primary">@ViewBag.TotalCount</span>
+                                    <span class="stat-label">İşlem Sayısı</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stat-box">
+                                    <span class="stat-number text-warning">@ViewBag.PendingCount</span>
+                                    <span class="stat-label">Bekleyen</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="teslim" style="display:none;">
+            <div class="custom-card">
+                <h4 class="card-title text-success"><i class="fas fa-leaf me-2"></i>Atık Teslim Formu</h4>
+                <form asp-controller="Dashboard" asp-action="CreateDelivery" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="Enlem" id="hiddenLat" />
+                    <input type="hidden" name="Boylam" id="hiddenLng" />
+
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label class="fw-bold text-secondary mb-2">Atık Türü</label>
+                            <select name="AtikTuru" class="form-select form-select-lg bg-light border-0">
+                                <option value="Kağıt">Kağıt / Karton</option>
+                                <option value="Plastik">Plastik</option>
+                                <option value="Cam">Cam</option>
+                                <option value="Metal">Metal</option>
+                                <option value="Elektronik">Elektronik</option>
+                                <option value="Atık Yağ">Atık Yağ</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label class="fw-bold text-secondary mb-2">Tahmini Miktar (KG)</label>
+                            <input type="text" name="MiktarKG" class="form-control form-control-lg bg-light border-0" placeholder="Örn: 3.5" required />
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="fw-bold text-secondary mb-2">Adres Bilgisi</label>
+                        <div class="input-group">
+                            <input type="text" name="LokasyonBilgisi" id="adresInput" class="form-control bg-light border-0" placeholder="Mahalle, Sokak, Kapı No..." required />
+                            <button type="button" class="btn btn-outline-secondary" onclick="openMapModal()">
+                                <i class="fas fa-map-marker-alt me-1"></i> Haritadan Seç
+                            </button>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-success btn-lg w-100 fw-bold py-3">Talebi Oluştur</button>
+                </form>
+            </div>
+        </section>
+
+        <section id="gecmis" style="display:none;">
+            <div class="custom-card">
+                <h4 class="card-title text-primary"><i class="fas fa-history me-2"></i>Geçmiş İşlemlerim</h4>
+
+                @if (deliveries != null && deliveries.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light"><tr><th>Tarih</th><th>Tür</th><th>Miktar</th><th>Durum</th><th>İşlem</th></tr></thead>
+                            <tbody>
+                                @foreach (var d in deliveries)
+                                {
+                                    <tr>
+                                        <td class="fw-bold text-secondary">@d.TeslimatTarihi.ToString("dd.MM.yyyy")</td>
+                                        <td><span class="badge bg-light text-dark border">@d.AtikTuru</span></td>
+                                        <td class="fw-bold">@d.MiktarKG kg</td>
+                                        <td>
+                                            @if (d.Durum == "Beklemede")
+                                            {
+                                                <span class="badge bg-warning text-dark">Beklemede</span>
+                                            }
+                                            else if (d.Durum == "Tamamlandı")
+                                            {
+
+                                                <span class="badge bg-success">Alındı</span>
+                                            }
+                                            else
+                                            {
+
+                                                <span class="badge bg-secondary">@d.Durum</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (d.Durum == "Beklemede")
+                                            {
+                                                <form asp-controller="Dashboard" asp-action="CancelDelivery" method="post" class="d-inline">
+                                                    <input type="hidden" name="id" value="@d.Id" />
+                                                    <button class="btn btn-sm btn-light text-danger" onclick="return confirm('İptal edilsin mi?')"><i class="fas fa-trash"></i></button>
+                                                </form>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-5 text-muted">
+                        <i class="fas fa-inbox fa-3x mb-3 opacity-25"></i>
+                        <p>Henüz bir kayıt bulunamadı.</p>
+                    </div>
+                }
+            </div>
+        </section>
+
+        <section id="duyurular" style="display:none;">
+            <div class="custom-card">
+                <h4 class="card-title text-warning"><i class="fas fa-bullhorn me-2"></i>Güncel Duyurular</h4>
+
+                @if (announcements != null && announcements.Any())
+                {
+                    <ul class="announcement-list">
+                        @foreach (var d in announcements)
+                        {
+                            <li>
+                                <span class="announcement-date"><i class="far fa-clock me-1"></i> @d.Tarih.ToString("dd MMMM yyyy")</span>
+                                <span class="announcement-title">@d.Baslik</span>
+                                <p class="text-secondary mb-0 small">@d.Icerik</p>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p class="text-center text-muted py-4">Şu an aktif bir duyuru yok.</p>
+                }
+            </div>
+        </section>
+
+        <div class="modal fade" id="mapModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-dark text-white"><h5 class="modal-title">Konum Seçin</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+                    <div class="modal-body p-0"><div id="mapPicker"></div></div>
+                    <div class="modal-footer"><button type="button" class="btn btn-success w-100" onclick="confirmMapLocation()">KONUMU ONAYLA</button></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="passwordModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form asp-controller="Dashboard" asp-action="ChangePassword" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="modal-header bg-dark text-white"><h5 class="modal-title">Şifre Değiştir</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="small text-muted fw-bold">MEVCUT ŞİFRE</label>
+                                <input type="password" name="OldPassword" class="form-control" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="small text-muted fw-bold">YENİ ŞİFRE</label>
+                                <input type="password" name="NewPassword" class="form-control" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="small text-muted fw-bold">YENİ ŞİFRE (TEKRAR)</label>
+                                <input type="password" name="ConfirmPassword" class="form-control" required />
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-success w-100">GÜNCELLE</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD64r0VElvouQ6l9Z_L53QmJIC8tMTmcvM&libraries=places&callback=initApp" async defer></script>
+    <script>
+        function showSection(id) {
+            document.querySelectorAll("section").forEach(s => s.style.display = "none");
+            document.getElementById(id).style.display = "block";
+            document.querySelectorAll(".nav-link").forEach(l => l.classList.remove("active"));
+            document.getElementById("link-" + id).classList.add("active");
+        }
+
+        var mapPicker, userMarker, geocoder, autocomplete;
+        function initApp() {
+            var input = document.getElementById('adresInput');
+            autocomplete = new google.maps.places.Autocomplete(input);
+            autocomplete.addListener('place_changed', function() {
+                var place = autocomplete.getPlace();
+                if (!place.geometry) { alert("Lütfen listeden geçerli bir yer seçin."); return; }
+                document.getElementById('hiddenLat').value = place.geometry.location.lat();
+                document.getElementById('hiddenLng').value = place.geometry.location.lng();
+            });
+        }
+        function openMapModal() {
+            var myModal = new bootstrap.Modal(document.getElementById('mapModal')); myModal.show();
+            document.getElementById('mapModal').addEventListener('shown.bs.modal', function () {
+                var latVal = document.getElementById('hiddenLat').value; var lngVal = document.getElementById('hiddenLng').value;
+                var center = (latVal) ? { lat: parseFloat(latVal), lng: parseFloat(lngVal) } : { lat: 37.2154, lng: 28.3636 };
+                if(!mapPicker) {
+                    mapPicker = new google.maps.Map(document.getElementById("mapPicker"), { center: center, zoom: 15 });
+                    userMarker = new google.maps.Marker({ position: center, map: mapPicker, draggable: true });
+                    geocoder = new google.maps.Geocoder();
+                    mapPicker.addListener("click", (e) => { userMarker.setPosition(e.latLng); });
+                } else { mapPicker.setCenter(center); userMarker.setPosition(center); }
+                google.maps.event.trigger(mapPicker, 'resize');
+            }, { once: true });
+        }
+        function confirmMapLocation() {
+            var pos = userMarker.getPosition();
+            document.getElementById('hiddenLat').value = pos.lat(); document.getElementById('hiddenLng').value = pos.lng();
+            geocoder.geocode({ location: pos }, (results, status) => {
+                if (status === "OK" && results[0]) { document.getElementById('adresInput').value = results[0].formatted_address; }
+                bootstrap.Modal.getInstance(document.getElementById('mapModal')).hide();
+            });
+        }
+        document.addEventListener("DOMContentLoaded", function() { showSection('profil'); });
+    </script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+﻿@model List<AtikDonusum.Controllers.RouteController.RoutePoint>
+
+@{
+    ViewData["Title"] = "Rota Haritası";
+}
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-md-4">
+            <h4>Rota Adımları</h4>
+            <ul class="list-group">
+                @foreach (var point in Model.OrderBy(x => x.Order))
+                {
+                    <li class="list-group-item">
+                        <strong>@point.Order. Adım:</strong> @point.Name <br />
+                        <small>@point.Address</small>
+                    </li>
+                }
+            </ul>
+            <a asp-action="Index" class="btn btn-secondary w-100 mt-3">Geri Dön</a>
+        </div>
+        <div class="col-md-8">
+            <div id="map" style="height: 600px; width: 100%;"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function initMap() {
+        var points = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model));
+        var map = new google.maps.Map(document.getElementById('map'), {
+            center: { lat: points[0].Lat, lng: points[0].Lng },
+            zoom: 12
+        });
+
+        var directionsService = new google.maps.DirectionsService();
+        var directionsRenderer = new google.maps.DirectionsRenderer({ map: map });
+
+        var waypts = [];
+        for (var i = 1; i < points.length; i++) {
+            waypts.push({ location: { lat: points[i].Lat, lng: points[i].Lng }, stopover: true });
+        }
+
+        directionsService.route({
+            origin: { lat: points[0].Lat, lng: points[0].Lng },
+            destination: { lat: points[points.length-1].Lat, lng: points[points.length-1].Lng },
+            waypoints: waypts,
+            optimizeWaypoints: true,
+            travelMode: 'DRIVING'
+        }, function(response, status) {
+            if (status === 'OK') directionsRenderer.setDirections(response);
+            else window.alert('Rota hatası: ' + status);
+        });
+    }
+</script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBblskHVFdKH0ni9vmzPpRzmcbQ1kKimlY&callback=initMap"></script>

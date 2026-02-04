@@ -1,0 +1,123 @@
+﻿@model List<AtikDonusum.Models.Delivery>
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Google Maps Rota Planı</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+
+        #floating-panel {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 5;
+            background-color: #fff;
+            padding: 15px;
+            border: 1px solid #999;
+            width: 300px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border-radius: 5px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .step-num {
+            display: inline-block;
+            background: #4285F4;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            text-align: center;
+            line-height: 20px;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="floating-panel">
+        <h6 class="fw-bold mb-3">Rota Planı</h6>
+        <div class="mb-2 border-bottom pb-2">
+            <span class="step-num" style="background:#DB4437;">G</span> <strong>GARAJ (Başlangıç)</strong>
+        </div>
+        @for (int i = 0; i < Model.Count; i++)
+        {
+            <div class="mb-2 border-bottom pb-2">
+                <span class="step-num">@(i + 1)</span> <strong>@Model[i].AtikTuru</strong><br>
+                <small class="text-muted ms-4">@Model[i].LokasyonBilgisi</small>
+            </div>
+        }
+        <a href="/Admin/Index#rotalar" class="btn btn-sm btn-dark w-100 mt-2">Geri Dön</a>
+    </div>
+
+    <div id="map"></div>
+
+    <script>
+        function initMap() {
+            var directionsService = new google.maps.DirectionsService();
+            var directionsRenderer = new google.maps.DirectionsRenderer();
+            var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 13, center: { lat: 37.2154, lng: 28.3636 } // Muğla
+            });
+            directionsRenderer.setMap(map);
+            calculateRoute(directionsService, directionsRenderer);
+        }
+
+        function calculateRoute(directionsService, directionsRenderer) {
+            var waypts = [];
+
+            @foreach (var item in Model)
+            {
+                    if (item.Enlem != 0)
+                    {
+                            <text>
+                            waypts.push({
+                                location: new google.maps.LatLng(@item.Enlem.ToString().Replace(',', '.'), @item.Boylam.ToString().Replace(',', '.')),
+                                stopover: true
+                            });
+                            </text>
+                    }
+            }
+
+            if (waypts.length === 0) { alert("Rotada geçerli konum yok."); return; }
+
+            // Son noktayı 'destination' (varış) yap, diğerlerini aradaki durak (waypoint) yap
+            var destination = waypts[waypts.length - 1].location;
+            waypts.pop(); // Son elemanı listeden çıkar
+
+            directionsService.route({
+                origin: new google.maps.LatLng(37.2154, 28.3636), // Garaj
+                destination: destination,
+                waypoints: waypts,
+                optimizeWaypoints: false,
+                travelMode: 'DRIVING'
+            }, function(response, status) {
+                if (status === 'OK') { directionsRenderer.setDirections(response); }
+                else { window.alert('Google Rota Hatası: ' + status); }
+            });
+        }
+    </script>
+
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBblskHVFdKH0ni9vmzPpRzmcbQ1kKimlY&callback=initMap"></script>
+
+</body>
+</html>

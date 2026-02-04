@@ -1,0 +1,77 @@
+﻿@model IEnumerable<AtikDonusum.Models.Delivery>
+
+@{
+    ViewData["Title"] = "Teslimat Geçmişim";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="text-primary mb-0">Teslimat Geçmişim</h3>
+        <a asp-action="Create" class="btn btn-success">
+            <i class="fa fa-plus"></i> Yeni Talep Oluştur
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            @if (!Model.Any())
+            {
+                <div class="text-center p-5">
+                    <h5 class="text-muted">Henüz hiç atık teslimat talebiniz yok.</h5>
+                    <p class="text-muted">Çevreyi korumaya başlamak için hemen yukarıdaki butona tıkla!</p>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="p-3">Atık Türü</th>
+                                <th>Miktar</th>
+                                <th>Adres</th>
+                                <th>Tarih</th>
+                                <th>Durum</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="p-3 fw-bold">@item.AtikTuru</td>
+                                    <td>@item.MiktarKG KG</td>
+                                    <td class="text-truncate" style="max-width: 200px;" title="@item.LokasyonBilgisi">
+                                        @item.LokasyonBilgisi
+                                    </td>
+                                    <td>@item.TeslimatTarihi.ToString("dd.MM.yyyy HH:mm")</td>
+                                    <td>
+                                        @if (item.Durum == "Beklemede")
+                                        {
+                                            <span class="badge bg-warning text-dark">Beklemede</span>
+                                        }
+                                        else if (item.Durum == "Onaylandı")
+                                        {
+                                            <span class="badge bg-info">Onaylandı</span>
+                                        }
+                                        else if (item.Durum == "Yolda")
+                                        {
+                                            <span class="badge bg-primary">Araç Yolda</span>
+                                        }
+                                        else if (item.Durum == "Tamamlandı")
+                                        {
+                                            <span class="badge bg-success">Tamamlandı</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">@item.Durum</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>

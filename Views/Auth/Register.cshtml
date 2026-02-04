@@ -1,0 +1,102 @@
+﻿@* Dosya Yolu: Views/Auth/Register.cshtml *@
+@model AtikDonusum.Models.RegisterModel
+
+@{
+    Layout = null; // Bu sayfanın bir _Layout (template) kullanmamasını sağlar
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Kayıt Ol | Dijital Atık Takip Sistemi</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/login.css" />
+
+    <style>
+        .text-danger {
+            color: red;
+            font-size: 0.9em;
+            text-align: left;
+            width: 100%;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-wrapper">
+        <div class="login-card">
+            <div class="logo">♻️</div>
+            <h2 class="title">Yeni Hesap Oluştur</h2>
+            <p class="subtitle">Atık dönüşüm sistemine katılın</p>
+
+            <form asp-controller="Auth" asp-action="Register" method="post" class="login-form">
+
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="form-group">
+                    <label asp-for="Ad"></label>
+                    <div class="input-wrapper">
+                        <input asp-for="Ad" class="form-control" placeholder="Adınızı girin" />
+                    </div>
+                    <span asp-validation-for="Ad" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Soyad"></label>
+                    <div class="input-wrapper">
+                        <input asp-for="Soyad" class="form-control" placeholder="Soyadınızı girin" />
+                    </div>
+                    <span asp-validation-for="Soyad" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="KullaniciAdi"></label>
+                    <div class="input-wrapper">
+                        <input asp-for="KullaniciAdi" class="form-control" placeholder="Kullanıcı adı seçin" />
+                    </div>
+                    <span asp-validation-for="KullaniciAdi" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Email"></label>
+                    <div class="input-wrapper">
+                        <input asp-for="Email" class="form-control" placeholder="E-posta adresinizi girin" />
+                    </div>
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Sifre"></label>
+                    <div class="input-wrapper">
+                        <input asp-for="Sifre" type="password" class="form-control" placeholder="Şifrenizi girin" />
+                    </div>
+                    <span asp-validation-for="Sifre" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="SifreTekrar"></label>
+                    <div class="input-wrapper">
+                        <input asp-for="SifreTekrar" type="password" class="form-control" placeholder="Şifrenizi tekrar girin" />
+                    </div>
+                    <span asp-validation-for="SifreTekrar" class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="btn-login">Kayıt Ol</button>
+                <p class="register-link">
+                    Zaten hesabınız var mı? <a asp-controller="Auth" asp-action="Login">Giriş Yap</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    @* ASP.NET Core MVC'nin validation scriptlerini eklemek iyi bir pratiktir *@
+    @* Bu scriptlerin çalışması için projenizde jquery-validation yüklü olmalı (genellikle wwwroot/lib altında gelir) *@
+    @* <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script> *@
+    @* <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script> *@
+</body>
+</html>

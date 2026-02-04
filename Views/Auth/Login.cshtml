@@ -1,0 +1,58 @@
+﻿@model AtikDonusum.Models.LoginModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Giriş Yap | Dijital Atık Takip Sistemi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/login.css" />
+    <style>
+        .text-danger {
+            color: red;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-wrapper">
+        <div class="login-card">
+            <div class="logo">♻️</div>
+            <h2 class="title">Dijital Atık Takip Sistemi</h2>
+            <p class="subtitle">Sisteme giriş yaparak atık yönetimini dijitalleştirin</p>
+
+            <form asp-controller="Auth" asp-action="Login" method="post" class="login-form">
+
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                @Html.AntiForgeryToken()
+
+                <div class="form-group">
+                    <label asp-for="KullaniciAdi">Kullanıcı Adı</label>
+                    <div class="input-wrapper">
+                        <span class="icon">👤</span>
+                        <input asp-for="KullaniciAdi" class="form-control" required placeholder="Kullanıcı adınızı girin" />
+                    </div>
+                    <span asp-validation-for="KullaniciAdi" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Sifre">Şifre</label>
+                    <div class="input-wrapper">
+                        <span class="icon">🔒</span>
+                        <input asp-for="Sifre" type="password" class="form-control" required placeholder="Şifrenizi girin" />
+                    </div>
+                    <span asp-validation-for="Sifre" class="text-danger"></span>
+                </div>
+                <button type="submit" class="btn-login">Giriş Yap</button>
+                <p class="register-link">Hesabınız yok mu? <a asp-controller="Auth" asp-action="Register">Kayıt Ol</a></p>
+            </form>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+</body>
+</html>

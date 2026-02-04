@@ -1,0 +1,371 @@
+﻿@using AtikDonusum.Models
+@{
+    Layout = null;
+    var availableVehicles = ViewBag.AvailableVehicles as List<Vehicle>;
+    var allVehicles = ViewBag.VehiclesList as List<Vehicle>;
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atık Yönetimi | Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        body {
+            font-family: 'Segoe UI',sans-serif;
+            background: #f8fafc;
+            margin: 0;
+            display: flex;
+            min-height: 100vh
+        }
+
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(180deg,#0f172a 0%,#1e293b 100%);
+            color: #fff;
+            position: fixed;
+            height: 100vh;
+            padding-top: 25px;
+            z-index: 1000
+        }
+
+            .sidebar h3 {
+                font-size: 1.4rem;
+                color: #10b981;
+                margin-bottom: 2rem;
+                text-align: center;
+                font-weight: 800
+            }
+
+        .nav-link {
+            color: #94a3b8;
+            padding: 16px 25px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            transition: 0.3s
+        }
+
+            .nav-link:hover, .nav-link.active {
+                background: rgba(255,255,255,0.08);
+                color: #fff;
+                border-left: 4px solid #10b981
+            }
+
+        .main {
+            margin-left: 260px;
+            width: calc(100% - 260px);
+            padding: 30px
+        }
+
+        .card-custom {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid #f1f5f9;
+            position: relative
+        }
+
+        .stat-card h3 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin: 0;
+            color: #1e293b
+        }
+
+        .btn-toggle-custom {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 10;
+            font-size: 0.75rem;
+            border-radius: 20px;
+            padding: 5px 12px;
+        }
+
+        #mapView, #mapRoute {
+            width: 100%;
+            background: #e2e8f0;
+            border-radius: 12px
+        }
+
+        #mapView {
+            height: 500px
+        }
+
+        #mapRoute {
+            height: 600px
+        }
+
+        .driver-link-overlay {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            z-index: 50;
+            background: rgba(255,255,255,0.98);
+            padding: 15px;
+            border-radius: 12px;
+            width: 380px
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h3><i class="fas fa-recycle me-2"></i>ATIK YÖNETİMİ</h3>
+        <div class="nav-link active" onclick="showSection('dashboard')" id="link-dashboard"><i class="fas fa-chart-pie me-2"></i> Özet</div>
+        <div class="nav-link" onclick="showSection('rotalar')" id="link-rotalar"><i class="fas fa-truck me-2"></i> Rotalar</div>
+        <div class="nav-link" onclick="showSection('teslimatlar')" id="link-teslimatlar"><i class="fas fa-box-open me-2"></i> Atıklar</div>
+        <div class="nav-link" onclick="showSection('users')" id="link-users"><i class="fas fa-users me-2"></i> Kullanıcılar</div>
+        <div class="nav-link" onclick="showSection('duyurular')" id="link-duyurular"><i class="fas fa-bullhorn me-2"></i> Duyurular</div>
+        <div style="position:absolute;bottom:30px;width:100%;padding:0 20px;"><form asp-controller="Auth" asp-action="Logout" method="post">@Html.AntiForgeryToken()<button class="btn btn-outline-danger w-100">Çıkış</button></form></div>
+    </div>
+
+    <div class="main">
+        <section id="dashboard" class="active">
+            <h4 class="fw-bold text-dark mb-4">Yönetim Paneli</h4>
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                    <div class="card-custom stat-card border-start border-4 border-primary">
+                        <button class="btn btn-sm btn-outline-primary btn-toggle-custom" onclick="toggleTotalCard(this)">Gelecek (AI)</button>
+                        <div id="cardTotalContent">
+                            <p class="text-muted small fw-bold">TOPLANAN (Bu Hafta)</p>
+                            <h3>@ViewBag.TotalKgReal <span class="fs-6 text-muted">kg</span></h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3"><div class="card-custom stat-card"><div><p class="text-muted small fw-bold">TOPLAM İŞLEM</p><h3>@ViewBag.TotalDeliveries</h3></div></div></div>
+                <div class="col-md-3"><div class="card-custom stat-card"><div><p class="text-muted small fw-bold">GÜNLÜK YAKIT</p><h3>@ViewBag.DailyFuelCost ₺</h3></div></div></div>
+                <div class="col-md-3"><div class="card-custom stat-card"><div><p class="text-muted small fw-bold">MAZOT</p><h3>@ViewBag.DieselPrice ₺</h3></div></div></div>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-8">
+                    <div class="card-custom h-100">
+                        <h5 class="fw-bold text-secondary mb-3" id="titleTrend">Haftalık Analiz (Genel)</h5>
+                        <button class="btn btn-sm btn-outline-primary btn-toggle-custom" onclick="toggleTrendMode(this)">Tahmin Göster</button>
+                        <div style="height:350px"><canvas id="trendChart"></canvas></div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card-custom h-100">
+                        <h5 class="fw-bold text-secondary mb-3" id="titlePie">Atık Dağılımı</h5>
+                        <button class="btn btn-sm btn-outline-primary btn-toggle-custom" onclick="togglePieMode(this)">Tahmin</button>
+                        <div style="height:250px"><canvas id="pieChart"></canvas></div>
+                        <p class="text-center text-muted small mt-3"><i class="fas fa-mouse-pointer"></i> Dilimlere tıklayarak diğer grafikleri filtrele.</p>
+                        <div class="text-center mt-2" id="filterResetBtn" style="display:none;"><button class="btn btn-sm btn-outline-secondary" onclick="resetFilter()">Filtreyi Temizle</button></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card-custom h-100">
+                        <h5 class="fw-bold text-secondary mb-3" id="titleRegion">Bölgesel Yoğunluk</h5>
+                        <button class="btn btn-sm btn-outline-primary btn-toggle-custom" onclick="toggleRegionMode(this)">AI Analiz</button>
+                        <div id="regionTableContainer"><table class="table table-sm table-borderless align-middle" id="tableRegion"></table></div>
+                    </div>
+                </div>
+                <div class="col-md-8"><div class="card-custom h-100"><h5 class="fw-bold text-secondary mb-3">Araç Filosu</h5><div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead class="table-light"><tr><th>Plaka</th><th>Model</th><th>Kapasite</th><th>Durum</th></tr></thead><tbody>@if(ViewBag.VehicleStats!=null){foreach(var v in (IEnumerable<dynamic>)ViewBag.VehicleStats){
+                <tr><td class="fw-bold">@v.Plaka</td><td>@v.Model</td><td>@v.Kapasite kg</td><td><span class="badge @(v.Durum == "Meşgul" ? "bg-danger" : "bg-success") bg-opacity-25 text-dark">@(v.Durum ?? "Aktif")</span></td></tr>
+                                }}
+</tbody></table></div></div></div>
+            </div>
+        </section>
+
+        <section id="duyurular" style="display:none;"><h4 class="fw-bold text-dark mb-4">Duyuru Yönetimi</h4><div class="row"><div class="col-md-4"><div class="card-custom border-start border-4 border-warning"><h5 class="fw-bold text-secondary mb-3">Yeni Duyuru</h5><form asp-action="CreateAnnouncement" method="post"><div class="mb-3"><label class="fw-bold small">BAŞLIK</label><input name="Baslik" class="form-control" required /></div><div class="mb-3"><label class="fw-bold small">İÇERİK</label><textarea name="Icerik" class="form-control" rows="5" required></textarea></div><button class="btn btn-warning w-100 fw-bold">YAYINLA</button></form></div></div><div class="col-md-8"><div class="card-custom"><h5 class="fw-bold text-secondary mb-3">Yayınlanan Duyurular</h5><table class="table table-hover align-middle"><thead class="bg-light"><tr><th>Tarih</th><th>Başlık</th><th>İçerik</th><th></th></tr></thead><tbody>@if(ViewBag.Announcements!=null){foreach(var a in (IEnumerable<AtikDonusum.Models.Announcement>)ViewBag.Announcements){
+        <tr><td class="text-muted small">@a.Tarih.ToString("dd.MM HH:mm")</td><td class="fw-bold">@a.Baslik</td><td class="text-secondary small">@a.Icerik</td><td><form asp-action="DeleteAnnouncement" method="post"><input type="hidden" name="id" value="@a.Id" /><button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button></form></td></tr>
+                }}
+</tbody></table></div></div></div></section>
+        <section id="rotalar" style="display:none;"><div class="row mb-4"><div class="col-md-12"><div class="card-custom border-start border-4 border-warning"><h5 class="fw-bold mb-3 text-secondary">Yeni Araç Tanımla</h5><form asp-action="CreateVehicle" method="post" class="row g-3 align-items-end"><div class="col-md-3"><label class="small text-muted fw-bold">PLAKA</label><input name="Plaka" class="form-control" required /></div><div class="col-md-3"><label class="small text-muted fw-bold">MODEL</label><input name="Model" class="form-control" required /></div><div class="col-md-3"><label class="small text-muted fw-bold">KAPASİTE</label><input name="KapasiteKG" type="number" class="form-control" required /></div><div class="col-md-3"><button class="btn btn-warning w-100 fw-bold">Kaydet</button></div></form></div></div></div><div class="card-custom mb-4"><h5 class="fw-bold mb-3 text-secondary">Filo Yönetimi</h5><table class="table table-hover align-middle"><thead class="bg-light"><tr><th>Plaka</th><th>Model</th><th>Kapasite</th><th>Durum</th><th>İşlem</th></tr></thead><tbody>@if (allVehicles != null) { foreach (var v in allVehicles) {
+        <tr><td class="fw-bold">@v.Plaka</td><td>@v.Model</td><td>@v.KapasiteKG kg</td><td><span class="badge @(v.Durum == "Meşgul" ? "bg-danger" : "bg-success") text-white">@v.Durum</span></td><td><form asp-action="DeleteVehicle" method="post" class="d-inline"><input type="hidden" name="id" value="@v.Id" /><button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button></form></td></tr>
+                } }
+</tbody></table></div><div class="d-flex justify-content-between mb-3"><h4 class="fw-bold">Rota Planlama</h4><button class="btn btn-primary" onclick="toggleForm('formRota')">Yeni Rota</button></div><div id="formRota" class="card-custom bg-white mb-4" style="display:none; border-left: 5px solid #3b82f6;"><form asp-controller="Admin" asp-action="CreateRoute" method="post">@Html.AntiForgeryToken()<div class="row"><div class="col-md-4 mb-3"><label class="fw-bold small text-muted">ROTA İSMİ</label><input name="RotaAdi" class="form-control" required /></div><div class="col-md-4 mb-3"><label class="fw-bold small text-muted">ARAÇ (Sadece Müsait Olanlar)</label><select name="AracId" class="form-select" required><option value="">Seçiniz...</option>@if (availableVehicles != null) { foreach (var v in availableVehicles) {
+        <option value="@v.Id">@v.Plaka (@v.KapasiteKG kg)</option>
+                } }
+</select></div><div class="col-md-4 mb-3"><label class="fw-bold small text-muted">ATIKLAR</label><div class="bg-light border p-2 rounded" style="height:100px; overflow-y:auto;">@if (ViewBag.PendingDeliveries != null) { foreach (var d in (List<Delivery>)ViewBag.PendingDeliveries) {
+        <div class="form-check"><input type="checkbox" name="TeslimatIdleri" value="@d.Id" class="form-check-input" id="c_@d.Id"><label class="form-check-label small" for="c_@d.Id">@d.AtikTuru - @d.LokasyonBilgisi</label></div>
+                } }
+</div></div></div><button class="btn btn-primary w-100 fw-bold">ROTAYI OLUŞTUR</button></form></div><div class="card-custom p-0 overflow-hidden"><table class="table table-hover mb-0 align-middle"><thead class="bg-light"><tr><th>Rota Adı</th><th>Araç Plaka</th><th>Durum</th><th>İşlem</th></tr></thead><tbody>@if (ViewBag.RoutesList != null) { foreach (var r in (List<CollectionRoute>)ViewBag.RoutesList) { var aracPlaka = "-"; if(allVehicles != null) { var arac = allVehicles.FirstOrDefault(x => x.Id == r.AracId); if(arac != null) aracPlaka = arac.Plaka; }
+        <tr><td class="fw-bold px-4">@r.RotaAdi</td><td><span class="fw-bold text-primary">@aracPlaka</span></td><td><span class="badge bg-warning text-dark">@r.Durum</span></td><td class="px-4"><button onclick="showRoute(@r.Id)" class="btn btn-sm btn-outline-primary fw-bold me-1"><i class="fas fa-map-marked-alt"></i></button><form asp-action="DeleteRoute" class="d-inline"><input type="hidden" name="id" value="@r.Id" /><button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button></form></td></tr>
+                } }
+</tbody></table></div></section>
+        <section id="teslimatlar" style="display:none;"><div class="d-flex justify-content-between mb-3"><h4 class="fw-bold">Atık Havuzu</h4><button class="btn btn-success" onclick="new bootstrap.Modal(document.getElementById('modalNew')).show()">Manuel Giriş</button></div><div class="card-custom p-0 overflow-hidden"><table class="table table-hover mb-0 align-middle"><thead class="bg-light"><tr><th>Tür</th><th>Miktar</th><th>Konum</th><th>Durum</th><th>İşlem</th></tr></thead><tbody>@if (ViewBag.DeliveriesList != null) { foreach (var d in (List<Delivery>)ViewBag.DeliveriesList) {
+        <tr><td class="px-4"><span class="badge bg-info text-dark">@d.AtikTuru</span></td><td class="fw-bold">@d.MiktarKG kg</td><td>@if (d.Enlem != 0) {
+        <span class="text-success small">Var</span>
+                } else
+        {
+
+            <span class="text-danger small">Yok</span>
+        }
+</td><td><span class="badge-status bg-light text-dark border">@d.Durum</span></td><td class="px-4"><button class="btn btn-sm btn-link text-primary p-0 me-2" onclick="editDel(@d.Id,'@d.Durum')"><i class="fas fa-edit"></i></button><button class="btn btn-sm btn-link text-warning p-0 me-2" onclick="showUserLocation(@d.Enlem.ToString(System.Globalization.CultureInfo.InvariantCulture), @d.Boylam.ToString(System.Globalization.CultureInfo.InvariantCulture))"><i class="fas fa-map-marker-alt"></i></button><form asp-action="DeleteDelivery" class="d-inline"><input type="hidden" name="id" value="@d.Id" /><button class="btn btn-sm btn-link text-danger p-0"><i class="fas fa-trash"></i></button></form></td></tr>
+                } }
+</tbody></table></div></section>
+        <section id="users" style="display:none;"><h4 class="fw-bold mb-3">Kullanıcılar</h4><div class="card-custom"><form asp-action="CreateUser" method="post" class="row g-2 mb-4 bg-light p-3 rounded"><div class="col-md-3"><input name="UserName" class="form-control" placeholder="Ad" required /></div><div class="col-md-4"><input name="Email" class="form-control" placeholder="Email" required /></div><div class="col-md-3"><input name="Sifre" class="form-control" placeholder="Şifre" required /></div><div class="col-md-2"><button class="btn btn-primary w-100">Ekle</button></div></form><table class="table"><thead><tr><th>Kullanıcı</th><th>Email</th><th>İşlem</th></tr></thead><tbody>@if (ViewBag.UsersList != null){foreach (var u in (IList<ApplicationUser>)ViewBag.UsersList){
+        <tr><td class="fw-bold">@u.UserName</td><td class="text-muted">@u.Email</td><td><form asp-action="DeleteUser" method="post"><input type="hidden" name="id" value="@u.Id" /><button class="btn btn-sm btn-outline-danger">Sil</button></form></td></tr>
+                }}
+</tbody></table></div></section>
+
+        <div class="modal fade" id="modalViewMap" tabindex="-1"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-body p-0"><div id="mapView"></div></div></div></div></div>
+        <div class="modal fade" id="modalRoute" tabindex="-1"><div class="modal-dialog modal-xl"><div class="modal-content"><div class="modal-header"><h5 class="fw-bold">Navigasyon</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body p-0 position-relative"><div class="driver-link-overlay"><label class="fw-bold small text-primary mb-2">MOBİL LİNK</label><div class="input-group"><input type="text" id="routeLinkInput" class="form-control form-control-sm" readonly><button class="btn btn-primary btn-sm" onclick="copyRouteLink()">Kopyala</button></div></div><div id="mapRoute"></div></div></div></div></div>
+        <div class="modal fade" id="modalNew" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><form asp-action="CreateDelivery" method="post"><div class="modal-header bg-success text-white"><h5 class="modal-title">Atık Ekle</h5></div><div class="modal-body"><input name="KullaniciId" type="hidden" value="admin" /><div class="mb-3"><label>Tür</label><select name="AtikTuru" class="form-select"><option>Kağıt</option><option>Plastik</option><option>Cam</option><option>Metal</option></select></div><div class="mb-3"><label>Miktar (KG)</label><input name="MiktarKG" class="form-control" required /></div><div class="mb-3"><label>Adres</label><textarea name="LokasyonBilgisi" class="form-control"></textarea></div></div><div class="modal-footer"><button class="btn btn-success w-100">Kaydet</button></div></form></div></div></div>
+        <div class="modal fade" id="modalEdit" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><form asp-action="EditDelivery" method="post"><div class="modal-header"><h5 class="modal-title fw-bold">Durum</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><input type="hidden" name="Id" id="editId"><select name="Durum" class="form-select" id="editStat"><option>Beklemede</option><option>Rota Planlandı</option><option>Yolda</option><option>Tamamlandı</option><option>İptal Edildi</option></select></div><div class="modal-footer"><button class="btn btn-primary w-100">Güncelle</button></div></form></div></div></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD64r0VElvouQ6l9Z_L53QmJIC8tMTmcvM&libraries=places&loading=async&callback=initMap" async defer></script>
+    <script>
+        const MULA_CENTER = { lat: 37.2153, lng: 28.3636 }; var mapInstance=null, mapRoute=null, dirService=null, dirRenderer=null;
+
+        // C#'TAN GELEN VERİLER
+        var masterData = @Html.Raw(ViewBag.MasterData);
+        var pieRealTotals = @Html.Raw(ViewBag.PieReal);
+        var pieFutureTotals = @Html.Raw(ViewBag.PieFuture);
+
+        var totalReal = '@ViewBag.TotalKgReal';
+        var totalForecast = '@ViewBag.TotalKgForecast';
+
+        var chartInstances = { trend: null, pie: null };
+        var state = { trendMode: 'real', pieMode: 'real', regionMode: 'real', selectedType: 'Genel' };
+
+        function initMap() { console.log("Map Ready"); }
+
+        // --- 1. SOL ÜST KART ---
+        function toggleTotalCard(btn) {
+            var el = document.getElementById("cardTotalContent");
+            if (btn.innerText.includes("Gelecek")) {
+                el.innerHTML = `<p class="text-primary small fw-bold">GELECEK HAFTA TAHMİNİ</p><h3 class="text-primary">${totalForecast} <span class="fs-6 text-muted">kg</span></h3>`;
+                btn.innerText = "Gerçek"; btn.classList.remove("btn-outline-primary"); btn.classList.add("btn-primary");
+            } else {
+                el.innerHTML = `<p class="text-muted small fw-bold">TOPLANAN (Bu Hafta)</p><h3>${totalReal} <span class="fs-6 text-muted">kg</span></h3>`;
+                btn.innerText = "Gelecek (AI)"; btn.classList.add("btn-outline-primary"); btn.classList.remove("btn-primary");
+            }
+        }
+
+        // --- 2. HAFTALIK GRAFİK ---
+        function toggleTrendMode(btn) {
+            state.trendMode = state.trendMode === 'real' ? 'forecast' : 'real';
+            if(state.trendMode === 'forecast') { btn.innerText = "Gerçek Veri"; btn.classList.add('active'); }
+            else { btn.innerText = "Tahmin Göster"; btn.classList.remove('active'); }
+            renderMainChart(state.selectedType);
+        }
+
+        function renderMainChart(type) {
+            var ctx = document.getElementById('trendChart').getContext('2d');
+            if (chartInstances.trend) chartInstances.trend.destroy();
+
+            var data = masterData[type].Daily;
+            var datasets = [
+                { label: 'Geçen Hafta', data: data.Last, backgroundColor: '#ef4444', borderRadius: 4 },
+                { label: 'Bu Hafta', data: data.This, backgroundColor: '#3b82f6', borderRadius: 4 }
+            ];
+
+            if(state.trendMode === 'forecast') {
+                datasets.push({ label: 'Gelecek Hafta (AI)', data: data.Next, backgroundColor: '#8b5cf6', borderRadius: 4, borderWidth: 2, borderColor: '#7c3aed', borderDash: [5, 5] });
+                document.getElementById("titleTrend").innerText = type + " - Gelecek Tahmini";
+            } else {
+                document.getElementById("titleTrend").innerText = type + " - Haftalık Analiz";
+            }
+
+            chartInstances.trend = new Chart(ctx, { type: 'bar', data: { labels: ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'], datasets: datasets }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } } });
+        }
+
+        // --- 3. PASTA GRAFİĞİ (TIKLAMA ÖZELLİĞİ EKLENDİ) ---
+        function togglePieMode(btn) {
+            state.pieMode = state.pieMode === 'real' ? 'forecast' : 'real';
+            if(state.pieMode === 'forecast') { btn.innerText = "Gerçek"; btn.classList.add('active'); document.getElementById("titlePie").innerText = "Gelecek Dağılım Tahmini"; }
+            else { btn.innerText = "Tahmin"; btn.classList.remove('active'); document.getElementById("titlePie").innerText = "Mevcut Atık Dağılımı"; }
+            renderPieChart();
+        }
+
+        function renderPieChart() {
+            var ctx = document.getElementById('pieChart').getContext('2d');
+            if (chartInstances.pie) chartInstances.pie.destroy();
+
+            var sourceDict = state.pieMode === 'real' ? pieRealTotals : pieFutureTotals;
+            var labels = Object.keys(pieRealTotals);
+            var values = labels.map(l => sourceDict[l] || 0);
+
+            chartInstances.pie = new Chart(ctx, {
+                type: 'doughnut',
+                data: { labels: labels, datasets: [{ data: values, backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'], borderWidth: 0 }] },
+                options: {
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right' }
+                    },
+                    // *** TIKLAMA OLAYI BURADA ***
+                    onClick: (evt, elements) => {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            // Chart.js 3+ için doğru etiket alma yöntemi
+                            const typeName = chartInstances.pie.data.labels[index];
+
+                            // Diğer Grafikleri Güncelle
+                            state.selectedType = typeName;
+                            document.getElementById("filterResetBtn").style.display = "block";
+                            renderMainChart(typeName);
+                            updateRegionTable(typeName);
+                        }
+                    }
+                }
+            });
+        }
+
+        function resetFilter() {
+            state.selectedType = "Genel";
+            document.getElementById("filterResetBtn").style.display = "none";
+            renderMainChart("Genel");
+            updateRegionTable("Genel");
+        }
+
+        // --- 4. BÖLGESEL TABLO ---
+        function toggleRegionMode(btn) {
+            state.regionMode = state.regionMode === 'real' ? 'forecast' : 'real';
+            if(state.regionMode === 'forecast') { btn.innerText = "Gerçek Veri"; btn.classList.add('active'); }
+            else { btn.innerText = "AI Öneri"; btn.classList.remove('active'); }
+            updateRegionTable(state.selectedType);
+        }
+
+        function updateRegionTable(type) {
+            var details = masterData[type].Regions;
+            document.getElementById("titleRegion").innerText = "Bölgesel Yoğunluk (" + type + ")";
+            var html = "";
+
+            if (state.regionMode === 'forecast') {
+                html = `<thead><tr class="text-muted small"><th>Bölge</th><th class="text-end">AI Tahmin</th><th>Öneri</th></tr></thead><tbody>`;
+                details.forEach(item => { html += `<tr><td class="fw-bold small text-primary">${item.Mahalle}</td><td class="text-end fw-bold">${item.Gelecek} kg</td><td class="text-center small"><span class="${item.OneriClass}">${item.Oneri}</span></td></tr>`; });
+            } else {
+                html = `<thead><tr class="text-muted small"><th>Bölge</th><th class="text-end">Toplanan</th></tr></thead><tbody>`;
+                details.forEach(item => { html += `<tr><td class="fw-bold small text-dark">${item.Mahalle}</td><td><div class="d-flex align-items-center justify-content-end"><span class="fw-bold me-2 text-dark">${item.Gecmis} kg</span><div class="progress" style="width:50px;height:6px"><div class="progress-bar bg-secondary" style="width:100%"></div></div></div></td></tr>`; });
+            }
+            html += "</tbody>";
+            document.getElementById("tableRegion").innerHTML = html;
+        }
+
+        $(document).ready(function(){
+            var hash=window.location.hash.substring(1);
+            showSection(hash||'dashboard');
+
+            renderMainChart("Genel");
+            renderPieChart();
+            updateRegionTable("Genel");
+        });
+
+        function showSection(id){ document.querySelectorAll('section').forEach(s=>s.style.display='none'); document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active')); document.getElementById(id).style.display='block'; document.getElementById('link-'+id).classList.add('active'); }
+        function toggleForm(id){ var el=document.getElementById(id); el.style.display=(el.style.display==='none')?'block':'none'; }
+        function editDel(id,s){ document.getElementById('editId').value=id; document.getElementById('editStat').value=s; new bootstrap.Modal(document.getElementById('modalEdit')).show(); }
+        function copyRouteLink(){ var c=document.getElementById("routeLinkInput"); c.select(); navigator.clipboard.writeText(c.value); alert("Link Kopyalandı!"); }
+        function showRoute(id){ document.getElementById('routeLinkInput').value="Hesaplanıyor..."; new bootstrap.Modal(document.getElementById('modalRoute')).show(); document.getElementById('modalRoute').addEventListener('shown.bs.modal',function(){ if(!mapRoute){mapRoute=new google.maps.Map(document.getElementById("mapRoute"),{zoom:13,center:MULA_CENTER});dirService=new google.maps.DirectionsService();dirRenderer=new google.maps.DirectionsRenderer({map:mapRoute});}else{mapRoute.setCenter(MULA_CENTER);mapRoute.setZoom(13);} google.maps.event.trigger(mapRoute,"resize"); $.get('/Admin/GetRouteDetails?id='+id,function(r){ if(r.success&&r.data.length>0){ var waypts=[]; r.data.forEach(p=>{var lat=parseFloat(p.enlem||p.Enlem),lng=parseFloat(p.boylam||p.Boylam); if(lat>35&&lat<43)waypts.push({location:new google.maps.LatLng(lat,lng),stopover:true});}); if(waypts.length>0){ dirService.route({origin:MULA_CENTER,destination:MULA_CENTER,waypoints:waypts,optimizeWaypoints:true,travelMode:google.maps.TravelMode.DRIVING},function(resp,stat){ if(stat==="OK"){ dirRenderer.setDirections(resp); var orderedPoints=[]; var order=resp.routes[0].waypoint_order; for(var i=0;i<order.length;i++){var idx=order[i];var p=waypts[idx].location;orderedPoints.push(p.lat()+","+p.lng());} var lastPt=orderedPoints[orderedPoints.length-1]; orderedPoints.pop(); var waypointsStr=orderedPoints.join("|"); var link="https://www.google.com/maps/dir/?api=1&origin="+"&origin="+MULA_CENTER.lat+","+MULA_CENTER.lng+"&destination="+lastPt+"&waypoints="+waypointsStr+"&travelmode=driving"; document.getElementById('routeLinkInput').value=link; } else alert("Rota hatası: "+stat); }); } } }); },{once:true}); }
+        function showUserLocation(lat,lng){ var la=parseFloat(lat),lo=parseFloat(lng); while(la>90)la/=10; while(lo>180)lo/=10; new bootstrap.Modal(document.getElementById('modalViewMap')).show(); document.getElementById('modalViewMap').addEventListener('shown.bs.modal',function(){ var pos={lat:la,lng:lo}; var el=document.getElementById("mapView"); if(!mapInstance){mapInstance=new google.maps.Map(el,{center:pos,zoom:15});new google.maps.Marker({position:pos,map:mapInstance});}else{mapInstance.setCenter(pos); new google.maps.Marker({position:pos,map:mapInstance});} setTimeout(()=>google.maps.event.trigger(mapInstance,"resize"),100); },{once:true}); }
+    </script>
+</body>
+</html>

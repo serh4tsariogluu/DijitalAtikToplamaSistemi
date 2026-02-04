@@ -1,0 +1,103 @@
+﻿@model AtikDonusum.Models.Delivery
+
+@{
+    ViewData["Title"] = "Yeni Atık Teslimi";
+}
+
+<div class="container-fluid">
+    <h3 class="text-primary mb-4">Yeni Atık Teslimi</h3>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <form asp-controller="Delivery" asp-action="Create" method="post">
+                <input type="hidden" name="Enlem" id="UserEnlem" />
+                <input type="hidden" name="Boylam" id="UserBoylam" />
+
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Atık Türü</label>
+                        <select asp-for="AtikTuru" class="form-select p-3" required>
+                            <option value="" disabled selected>Tür Seçiniz...</option>
+                            <option value="Karisik">Karışık Evsel</option>
+                            <option value="Kagit">Kağıt / Karton</option>
+                            <option value="Plastik">Plastik</option>
+                            <option value="Cam">Cam</option>
+                            <option value="Metal">Metal</option>
+                            <option value="Elektronik">Elektronik</option>
+                            <option value="Pil">Atık Pil</option>
+                            <option value="Yag">Bitkisel Atık Yağ</option>
+                        </select>
+                        <span asp-validation-for="AtikTuru" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold">Miktar (KG)</label>
+                        <input asp-for="MiktarKG" type="number" step="0.1" min="0.1" class="form-control p-3" placeholder="Örn: 1.5" required />
+                        <span asp-validation-for="MiktarKG" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Adres / Konum</label>
+                        <div class="input-group">
+                            <input asp-for="LokasyonBilgisi" class="form-control p-3" placeholder="Mahalle, Sokak..." required />
+                            <button type="button" class="btn btn-outline-primary" onclick="getUserLocation()">
+                                <i class="bi bi-geo-alt-fill"></i> Konumumu Bul
+                            </button>
+                        </div>
+                        <div class="form-text">
+                            <small id="locationStatus" class="text-muted">Adres yazabilir veya butona basarak GPS konumu ekleyebilirsiniz.</small>
+                        </div>
+                        <span asp-validation-for="LokasyonBilgisi" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Notunuz</label>
+                        <input asp-for="Not" class="form-control p-3" placeholder="Varsa eklemek istedikleriniz..." />
+                    </div>
+
+                    <div class="col-12 mt-4">
+                        <button type="submit" class="btn btn-primary w-100 p-3 fw-bold fs-5">
+                            <i class="bi bi-geo-alt-fill me-2"></i> Adresi Kaydet ve Teslim Et
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        function getUserLocation() {
+            var status = document.getElementById("locationStatus");
+
+            if (!navigator.geolocation) {
+                status.innerHTML = "<span class='text-danger'>Tarayıcınız konum servisini desteklemiyor.</span>";
+                return;
+            }
+
+            status.innerHTML = "<span class='text-warning'><i class='spinner-border spinner-border-sm'></i> Konum alınıyor...</span>";
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    var lat = position.coords.latitude;
+                    var lng = position.coords.longitude;
+
+                    // Gizli inputları doldur
+                    document.getElementById("UserEnlem").value = lat;
+                    document.getElementById("UserBoylam").value = lng;
+
+                    status.innerHTML = "<span class='text-success fw-bold'><i class='bi bi-check-circle-fill'></i> Konum Başarıyla Alındı!</span>";
+                },
+                (error) => {
+                    status.innerHTML = "<span class='text-danger'>Konum alınamadı. Lütfen konum izni verin.</span>";
+                    console.error("Konum hatası:", error);
+                }
+            );
+        }
+    </script>
+}

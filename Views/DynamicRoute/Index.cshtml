@@ -1,0 +1,36 @@
+﻿@{
+    ViewData["Title"] = "Dinamik Rota Oluştur";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg">
+                <div class="card-header bg-success text-white">
+                    <h4><i class="fa fa-map-marked-alt"></i> Atık Toplama Rotası</h4>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Aracın merkezden çıkıp, aşağıdaki iki adrese uğrayıp geri döneceği rotayı hesapla.</p>
+
+                    <form asp-action="Calculate" method="post">
+                        <div class="form-group mb-3">
+                            <label class="fw-bold">1. Toplama Adresi (Senin Konumun)</label>
+                            <input type="text" name="Address1" class="form-control" placeholder="Örn: Üniversite Kampüsü" required />
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="fw-bold">2. Toplama Adresi (Benim Konumum)</label>
+                            <input type="text" name="Address2" class="form-control" placeholder="Örn: Rüya AVM" required />
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fa fa-route"></i> Rotayı Oluştur ve Aracı Kaldır
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

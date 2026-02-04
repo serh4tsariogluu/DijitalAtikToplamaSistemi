@@ -1,0 +1,101 @@
+﻿@model IEnumerable<AtikDonusum.Controllers.DynamicRouteController.Waypoint>
+
+@{
+    ViewData["Title"] = "Rota Simülasyonu";
+}
+
+<!-- Verileri JSON olarak sakla -->
+<div id="routeData" data-points='@Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model))'></div>
+
+<div class="container-fluid mt-3">
+    <div class="alert alert-primary d-flex align-items-center">
+        <i class="fa fa-info-circle fa-2x me-3"></i>
+        <div>
+            <strong>Rota Planlandı!</strong> Araç depodan çıkacak, sırasıyla adreslere uğrayıp atıkları alacak ve depoya geri dönecektir.
+        </div>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-body p-0">
+            <div id="map" style="height: 600px; width: 100%;"></div>
+        </div>
+    </div>
+
+    <div class="mt-3 text-center">
+        <a asp-action="Index" class="btn btn-secondary">Yeni Rota Planla</a>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- API KEY'ini buraya yapıştır -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=BURAYA_API_KEY_GELECEK&callback=initMap" async defer></script>
+
+    <script>
+        function initMap() {
+            var rawData = document.getElementById('routeData').getAttribute('data-points');
+            var points = JSON.parse(rawData);
+
+            // Depo konumu (İlk nokta)
+            var centerPos = { lat: points[0].Lat, lng: points[0].Lng };
+
+            var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 13,
+                center: centerPos,
+                mapTypeId: 'roadmap'
+            });
+
+            var pathCoordinates = [];
+            var bounds = new google.maps.LatLngBounds();
+
+            // Markerları Ekle
+            points.forEach(function (point, index) {
+                var position = { lat: point.Lat, lng: point.Lng };
+                pathCoordinates.push(position);
+                bounds.extend(position);
+
+                // Depo ve Uğrak noktaları için farklı ikonlar/renkler
+                var labelText = "";
+                var iconUrl = "";
+
+                if (point.Type === "Depot") {
+                    labelText = "D"; // Depo
+                    // Depo için özel ikon veya varsayılan
+                } else {
+                    labelText = index.toString(); // 1, 2
+                }
+
+                var marker = new google.maps.Marker({
+                    position: position,
+                    map: map,
+                    label: labelText,
+                    title: point.Name
+                });
+
+                var infoWindow = new google.maps.InfoWindow({
+                    content: `<strong>${point.Name}</strong><br>${point.Type === 'Depot' ? 'Başlangıç/Bitiş' : 'Atık Alımı'}`
+                });
+
+                marker.addListener("click", () => {
+                    infoWindow.open(map, marker);
+                });
+            });
+
+            // Rotayı Çiz (Araç Yolu)
+            var flightPath = new google.maps.Polyline({
+                path: pathCoordinates,
+                geodesic: true,
+                strokeColor: "#0d6efd", // Mavi renk
+                strokeOpacity: 0.8,
+                strokeWeight: 5,
+                icons: [{
+                    icon: { path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW },
+                    offset: '50%',
+                    repeat: '100px'
+                }]
+            });
+
+            flightPath.setMap(map);
+            map.fitBounds(bounds);
+        }
+    </script>
+}

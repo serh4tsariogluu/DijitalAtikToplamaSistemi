@@ -1,0 +1,209 @@
+﻿@model List<AtikDonusum.Models.Announcement>
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ana Sayfa | Dijital Atık Takip Sistemi</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/index.css" />
+    <style>
+        /* Hero bölümü için arka plan görseli ayarı */
+        .hero {
+            /* Görseli buraya ekliyoruz, dosya yolunu doğru belirttiğinden emin ol */
+            background-image: url('/images/hero-yatay.jpg'); /* image_3.png'yi recycle-bg.png olarak kaydettiğini varsayıyorum */
+            background-size: cover; /* Görselin tüm alanı kaplamasını sağlar */
+            background-position: center; /* Görseli ortalar */
+            background-repeat: no-repeat; /* Görselin tekrar etmesini engeller */
+            position: relative;
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+        }
+
+            /* Arka plan görselinin üzerine koyu bir katman ekleyerek metnin okunabilirliğini artırır */
+            .hero::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.6); /* Yarı saydam siyah katman */
+                z-index: 1;
+            }
+
+        .hero-content {
+            position: relative;
+            z-index: 2; /* Metnin koyu katmanın üzerinde görünmesini sağlar */
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header" data-aos="fade-down">
+        <div class="container nav-container">
+            <h1 class="logo">♻️ Dijital Atık Takip Sistemi</h1>
+            <nav class="main-nav">
+                <a href="#nasil-calisir">Nasıl Çalışır?</a>
+                <a href="#features">Özellikler</a>
+                <a href="#duyurular">Duyurular</a>
+                <a href="#faq">SSS</a>
+                <a href="/Auth/Login" class="btn-login">Giriş Yap</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container hero-content" data-aos="zoom-in">
+            <h2>Atıklarınız Kapınızdan Alınsın</h2>
+            <p>Siz talebi oluşturun, araçlarımız gelip adresinizden teslim alsın. <br>Doğayı korumak artık tek tık uzağınızda.</p>
+            <a href="/Auth/Register" class="btn-primary">Hemen Kayıt Ol</a>
+        </div>
+    </section>
+
+    <section id="nasil-calisir" class="info-section" data-aos="fade-up">
+        <div class="container">
+            <h2>Nasıl Çalışır?</h2>
+            <div style="display:flex; justify-content:space-around; flex-wrap:wrap; margin-top:30px;">
+                <div style="text-align:center; max-width:300px; margin-bottom:20px;">
+                    <i class="fas fa-user-plus fa-3x" style="color:#10b981; margin-bottom:15px;"></i>
+                    <h4>1. Kayıt Ol</h4>
+                    <p>Sisteme üye olun ve kullanıcı panelinize giriş yapın.</p>
+                </div>
+                <div style="text-align:center; max-width:300px; margin-bottom:20px;">
+                    <i class="fas fa-truck-pickup fa-3x" style="color:#10b981; margin-bottom:15px;"></i>
+                    <h4>2. Talep Oluştur</h4>
+                    <p>Atık türünü seçin, konumunuzu belirleyin ve kurye çağırın.</p>
+                </div>
+                <div style="text-align:center; max-width:300px; margin-bottom:20px;">
+                    <i class="fas fa-check-circle fa-3x" style="color:#10b981; margin-bottom:15px;"></i>
+                    <h4>3. Teslim Et</h4>
+                    <p>Aracımız kapınıza gelsin, atıklarınızı güvenle teslim edin.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="features" data-aos="fade-up">
+        <div class="container">
+            <h2>Sistemin Özellikleri</h2>
+            <div class="feature-grid">
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+                    <h3><i class="fas fa-map-marked-alt"></i> Adresten Alım</h3>
+                    <p>Atık noktası aramanıza gerek yok. Konumunuzu seçin, biz gelelim.</p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+                    <h3><i class="fas fa-history"></i> Geçmiş Takibi</h3>
+                    <p>Bugüne kadar ne kadar atık teslim ettiğinizi panelinizden inceleyin.</p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
+                    <h3><i class="fas fa-recycle"></i> Çeşitli Atık Türleri</h3>
+                    <p>Kağıt, Plastik, Metal, Cam, E-Atık, Pil ve Yağ gibi birçok türü destekliyoruz.</p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="400">
+                    <h3><i class="fas fa-route"></i> Akıllı Rota</h3>
+                    <p>Araçlarımız yapay zeka destekli rotalarla en hızlı şekilde size ulaşır.</p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="500">
+                    <h3><i class="fas fa-mobile-alt"></i> Kolay Kullanım</h3>
+                    <p>Sade ve anlaşılır arayüz ile herkes kolayca kullanabilir.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="duyurular" class="info-section" style="background:#f0fdf4;" data-aos="fade-up">
+        <div class="container">
+            <h2 style="color:#15803d;">📢 Güncel Duyurular</h2>
+
+            @if (Model != null && Model.Any())
+            {
+                <div class="announcement-grid" style="display:grid; gap:15px; text-align:left; max-width:800px; margin:0 auto;">
+                    @foreach (var item in Model)
+                    {
+                        <div style="background:white; padding:20px; border-radius:10px; border-left:5px solid #f59e0b; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
+                            <h4 style="margin:0 0 5px 0; color:#333; font-size:1.1rem; font-weight:600;">@item.Baslik</h4>
+                            <p style="margin:0; color:#555; font-size:0.95rem;">@item.Icerik</p>
+                            <small style="color:#888; display:block; margin-top:8px; font-size:0.8rem;">
+                                <i class="far fa-clock"></i> @item.Tarih.ToString("dd MMMM yyyy HH:mm")
+                            </small>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <p class="text-muted">Şu an aktif bir duyuru bulunmamaktadır.</p>
+            }
+        </div>
+    </section>
+
+    <section id="faq" class="info-section faq-section" data-aos="fade-up">
+        <div class="container">
+            <h2>❓ Sıkça Sorulan Sorular</h2>
+            <div class="faq-list">
+                <div class="faq-item">
+                    <h4>Hangi atıkları verebilirim?</h4>
+                    <p>Sistem üzerinden Kağıt, Plastik, Cam, Metal, Elektronik, Atık Pil ve Bitkisel Atık Yağ seçimi yapabilirsiniz.</p>
+                </div>
+                <div class="faq-item">
+                    <h4>Kurye ne zaman gelir?</h4>
+                    <p>Talebiniz oluşturulduktan sonra, bölgenizdeki en uygun araç rotasına eklenirsiniz ve gün içinde alım yapılır.</p>
+                </div>
+                <div class="faq-item">
+                    <h4>Ücret ödeyecek miyim?</h4>
+                    <p>Hayır, bu hizmet tamamen ücretsizdir. Amacımız geri dönüşümü teşvik etmektir.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="main-footer" data-aos="fade-up">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h4>Kurumsal</h4>
+                    <ul>
+                        <li><a href="#nasil-calisir">Nasıl Çalışır</a></li>
+                        <li><a href="#features">Özellikler</a></li>
+                        <li><a href="#faq">Sıkça Sorulanlar</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Hızlı Erişim</h4>
+                    <ul>
+                        <li><a href="/Auth/Register">Kayıt Ol</a></li>
+                        <li><a href="/Auth/Login">Kullanıcı Girişi</a></li>
+                        <li><a href="/Admin/Index">Personel Girişi</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>İletişim</h4>
+                    <ul>
+                        <li><a href="#">destek@dijitalatik.com</a></li>
+                        <li><a href="#">0850 123 45 67</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Dijital Atık Takip Sistemi. Tüm hakları saklıdır.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 800,
+            once: true
+        });
+    </script>
+</body>
+</html>

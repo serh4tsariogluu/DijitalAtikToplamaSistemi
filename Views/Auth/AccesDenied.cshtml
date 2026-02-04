@@ -1,0 +1,33 @@
+﻿@* Dosya Yolu: Views/Auth/AccessDenied.cshtml *@
+@{
+    Layout = null; // Login/Register sayfaları gibi, ana şablonu kullanmasın
+    ViewData["Title"] = "Erişim Reddedildi";
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] | Dijital Atık Takip Sistemi</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/login.css" />
+</head>
+<body>
+    <div class="login-wrapper">
+        <div class="login-card">
+            <div class="logo">⛔</div>
+            <h2 class="title">Erişim Reddedildi</h2>
+            <p class="subtitle">
+                Bu sayfayı görüntülemek için yetkiniz bulunmamaktadır.
+            </p>
+            <br />
+
+            <a asp-controller="Home" asp-action="Index" class="btn-login" style="text-align:center; text-decoration:none;">
+                Ana Sayfaya Dön
+            </a>
+        </div>
+    </div>
+</body>
+</html>
