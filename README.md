@@ -1,1 +1,1 @@
-# D-ijitalAt-kToplamaSistemi
+# DijitalAtikToplamaSistemi
